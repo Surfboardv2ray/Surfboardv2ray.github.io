@@ -1,0 +1,171 @@
+// Written by Surfboardv2ray
+// https://Surfboardv2ray.github.io
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Rename V2Ray Configs</title>
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #ff6600;
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        textarea, input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-family: monospace;
+        }
+        textarea {
+            height: 150px;
+            resize: vertical;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #e65c00;
+        }
+        .results {
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #fff9f0;
+            border-radius: 5px;
+            min-height: 100px;
+            max-height: 250px;
+            overflow-y: auto;
+            word-wrap: break-word; /* Text wraps inside the box */
+            white-space: pre-wrap; /* Keeps one config per line */
+            position: relative;
+        }
+        .copy-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            background-color: #ff6600;
+            color: white;
+            padding: 5px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Batch Rename V2Ray Configs</h1>
+
+        <label for="configInput">V2Ray Configs:</label>
+        <textarea id="configInput" placeholder="Paste your vmess://, vless://, or trojan:// configs here..."></textarea>
+
+        <label for="remarksInput">New Remarks (Aliases):</label>
+        <input type="text" id="remarksInput" placeholder="Enter new alias (remark) here...">
+
+        <button id="submitBtn">Modify Configs</button>
+
+        <label for="resultsBox">New Config (Modified Alias):</label>
+        <div id="resultsBox" class="results"></div>
+        <span id="copyIcon" class="copy-icon">📋</span>
+    </div>
+
+    <script>
+        // Copy to clipboard functionality
+        document.getElementById('copyIcon').addEventListener('click', function() {
+            const resultText = document.getElementById('resultsBox').textContent;
+            navigator.clipboard.writeText(resultText).then(() => {
+                alert("Results copied to clipboard!");
+            }).catch(err => {
+                alert("Failed to copy: " + err);
+            });
+        });
+
+        // Base64 decode function for vmess
+        function base64Decode(str) {
+            try {
+                return JSON.parse(atob(str));
+            } catch (e) {
+                return null;  // If not valid Base64, return null
+            }
+        }
+
+        // Handle config modification on submit
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            const configs = document.getElementById('configInput').value.trim().split('\n');
+            const newAlias = document.getElementById('remarksInput').value.trim();
+            const resultsBox = document.getElementById('resultsBox');
+            resultsBox.textContent = '';  // Clear previous results
+
+            if (!newAlias) {
+                alert('Please enter a new alias.');
+                return;
+            }
+
+            configs.forEach((configLine, index) => {
+                if (configLine.startsWith('vmess://')) {
+                    const encodedPart = configLine.slice(8);  // Get the part after 'vmess://'
+                    const decodedConfig = base64Decode(encodedPart);
+
+                    if (decodedConfig && decodedConfig.ps) {
+                        decodedConfig.ps = newAlias;  // Modify the alias (remarks)
+                        const updatedConfig = 'vmess://' + btoa(JSON.stringify(decodedConfig));
+                        resultsBox.textContent += updatedConfig + '\n';  // One config per line
+                    } else {
+                        console.error(`Skipping line ${index + 1}: Invalid Base64 or missing "ps" field.`);
+                    }
+                } else if (configLine.startsWith('vless://') || configLine.startsWith('trojan://')) {
+                    const splitConfig = configLine.split('#');  // Split by '#'
+                    const configPart = splitConfig[0];
+                    const currentAlias = splitConfig[1] || '';  // Alias after '#', if any
+
+                    if (configPart && currentAlias) {
+                        const updatedConfig = configPart + '#' + newAlias;  // Replace the alias
+                        resultsBox.textContent += updatedConfig + '\n';  // One config per line
+                    } else if (configPart && !currentAlias) {
+                        // If no alias, add one at the end
+                        const updatedConfig = configPart + '#' + newAlias;
+                        resultsBox.textContent += updatedConfig + '\n';  // One config per line
+                    } else {
+                        console.error(`Skipping line ${index + 1}: Invalid vless or trojan format.`);
+                    }
+                } else {
+                    console.error(`Skipping line ${index + 1}: Unsupported config type.`);
+                }
+            });
+
+            if (resultsBox.textContent === '') {
+                resultsBox.textContent = 'No valid configurations found.';
+            }
+        });
+    </script>
+</body>
+</html>
