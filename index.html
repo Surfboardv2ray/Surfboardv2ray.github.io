@@ -9,15 +9,17 @@
             margin: 0;
             padding: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             background-color: #fff; /* White background */
             font-family: Arial, sans-serif;
         }
 
         .container {
             text-align: center;
+            flex-grow: 1; /* Allows the container to take up the available space */
         }
 
         h1 {
@@ -43,22 +45,78 @@
             cursor: pointer;
             text-decoration: none;
             transition: background-color 0.3s ease;
+            display: block;
+            margin: 10px auto; /* Add spacing between buttons */
+            width: 250px; /* Optional: Set a fixed width */
         }
 
         .btn:hover {
             background-color: #ff4500; /* Darker orange on hover */
         }
+
+        .line {
+            width: 60%;
+            height: 1px;
+            background-color: #ccc; /* Light gray line */
+            margin: 20px auto;
+        }
+
+        .footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px; /* Space between content and footer */
+        }
+
+        .footer-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px; /* Space between icons */
+            margin-bottom: 10px;
+        }
+
+        .footer-icons a {
+            color: #000; /* Icon link color */
+            text-decoration: none;
+        }
+
+        .footer-icons img {
+            width: 40px; /* Icon size */
+            height: 40px;
+        }
+
+        .footer-text {
+            color: #000; /* Text color */
+            font-size: 1em;
+        }
+
     </style>
 </head>
 <body>
 
     <div class="container">
         <h1>Surfboardv2ray Pages</h1>
-        <div class="line"></div>
         <div class="divider"></div>
         <a href="https://Surfboardv2ray.github.io/ip-extract" class="btn">Config IP Extractor</a>
+        <div class="line"></div>
         <a href="text-tools.html" class="btn">Text Suffix/Prefix</a>
-        <a href="batch-rename.html" class="btn">Batch Rename Remarks/Prefix</a>
+        <div class="line"></div>
+        <a href="batch-rename.html" class="btn">Batch V2ray Remarks Rename</a>
+    </div>
+
+    <!-- Footer Section -->
+    <div class="footer">
+        <div class="footer-icons">
+            <a href="https://t.me/Surfboardv2ray" target="_blank">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram Icon">
+            </a>
+            <a href="https://github.com/Surfboardv2ray" target="_blank">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub Icon">
+            </a>
+        </div>
+        <div class="footer-text">
+            Surfboardv2ray, 2024
+        </div>
     </div>
 
 </body>
