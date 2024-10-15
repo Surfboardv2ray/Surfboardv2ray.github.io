@@ -46,17 +46,19 @@
   <div id="result-box"></div>
   
   <footer>&copy; 2024 <a href="https://github.com/Surfboardv2ray/fastly-CDN">Surfboardv2ray</a>
+  <br>
+    <p>If not working, consider running the HTML Webpage locally or <a href="https://github.com/Surfboardv2ray/fastly-CDN">deploying on Cloudflare Pages</a>.</p>
   </footer>
 
   <script>
     async function checkHostname(hostname) {
       try {
-        const response = await fetch(`http://ip-api.com/line/${hostname}`);
+        const response = await fetch(`https://ip-api.com/line/${hostname}`);
         if (!response.ok) throw new Error('Network error');
-        
+    
         const data = await response.text();
         const lines = data.split('\n');
-
+    
         if (lines[0].trim().toLowerCase() === 'success' &&
             (lines[10]?.includes('Fastly') || lines[11]?.includes('Fastly') || lines[12]?.includes('Fastly'))) {
           return hostname;
@@ -66,6 +68,7 @@
       }
       return null;
     }
+
 
     document.getElementById('start-btn').addEventListener('click', async () => {
       const input = document.getElementById('hostnames-input').value.trim();
