@@ -138,8 +138,12 @@
         const outputText = document.getElementById('outputText');
 
         inputText.addEventListener('input', () => {
-            let inputValue = inputText.value.replace(''); // One Line Wrap
-            outputText.textContent = btoa(inputValue); // Convert to Base64
+            let inputValue = inputText.value; // Keep new lines as they are
+            if (inputValue) {
+                outputText.textContent = btoa(inputValue); // Convert to Base64
+            } else {
+                outputText.textContent = ''; // Clear output if input is empty
+            }
         });
 
         function copyText() {
