@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch IP Replace</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fffaf0;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #ff6a00;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        textarea, input[type="text"], input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        input[type="submit"] {
+            background-color: #ff6a00;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #e55a00;
+        }
+
+        .results-box {
+            background-color: #f8f8f8;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            min-height: 150px;
+            max-height: 300px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .copy-icon {
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+        .copy-icon:hover {
+            opacity: 0.8;
+        }
+
+        .social-links {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .social-links img {
+            width: 30px;
+            height: 30px;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+
+        .social-links img:hover {
+            opacity: 0.7;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+        }
+
+        .footer {
+            text-align: center;
+            padding-bottom: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Batch IP Replace</h1>
+    
+    <label for="configInput">V2Ray Configs:</label>
+    <textarea id="configInput" rows="6" placeholder="Insert vmess://, vless://, or trojan:// configs here..."></textarea>
+
+    <label for="ipInput">IPs/Hostnames (one per line):</label>
+    <textarea id="ipInput" rows="4" placeholder="Insert IPs or Hostnames here..."></textarea>
+
+    <input type="submit" value="Submit" onclick="processConfigs()">
+
+    <label for="results">Modified Configs:
+        <img src="https://img.icons8.com/ios-glyphs/30/000000/copy.png" class="copy-icon" alt="Copy" onclick="copyResults()">
+    </label>
+    <div id="results" class="results-box">
+        <!-- Results will appear here -->
+    </div>
+</div>
+
+<div class="footer">
+    <div class="social-links">
+        <a href="https://t.me/Surfboardv2ray" target="_blank">
+            <img src="https://img.icons8.com/ios-filled/50/000000/telegram-app.png" alt="Telegram">
+        </a>
+        <a href="https://github.com/Surfboardv2ray" target="_blank">
+            <img src="https://img.icons8.com/ios-glyphs/50/000000/github.png" alt="GitHub">
+        </a>
+    </div>
+    <div class="footer-text">
+        Surfboardv2ray, 2024
+    </div>
+</div>
+
+<script>
+    function processConfigs() {
+        let configInput = document.getElementById('configInput').value.trim();
+        let ipInput = document.getElementById('ipInput').value.trim();
+        let resultBox = document.getElementById('results');
+        resultBox.innerHTML = ''; // Clear previous results
+
+        if (!configInput || !ipInput) {
+            alert('Please enter both V2Ray configs and IPs/hostnames.');
+            return;
+        }
+
+        let configs = configInput.split('\n');
+        let ips = ipInput.split('\n');
+        let newConfigs = [];
+
+        configs.forEach(config => {
+            if (config.startsWith('vmess://')) {
+                try {
+                    let base64Content = config.slice(8);
+                    let decoded = atob(base64Content);
+                    let jsonConfig = JSON.parse(decoded);
+
+                    ips.forEach(ip => {
+                        let modifiedConfig = { ...jsonConfig, add: ip.trim() }; // Replace IP
+                        let newVmess = 'vmess://' + btoa(JSON.stringify(modifiedConfig));
+                        newConfigs.push(newVmess);
+                    });
+                } catch (e) {
+                    console.warn('Invalid vmess config or not a base64 string. Skipping.');
+                }
+            } 
+            else if (config.startsWith('vless://')) {
+                try {
+                    let [protocol, userInfoHostPort] = config.split('://');
+                    let [userInfo, hostPortAndParams] = userInfoHostPort.split('@');
+                    let [hostPort, params] = hostPortAndParams.split('?');
+                    let [ip, port] = hostPort.split(':');
+
+                    ips.forEach(ipAddr => {
+                        let newVless = `${protocol}://${userInfo}@${ipAddr.trim()}:${port}?${params}`;
+                        newConfigs.push(newVless);
+                    });
+                } catch (e) {
+                    console.warn('Invalid vless config. Skipping.');
+                }
+            } 
+            else if (config.startsWith('trojan://')) {
+                try {
+                    let [protocol, userInfoHostPort] = config.split('://');
+                    let [userInfo, hostPortAndParams] = userInfoHostPort.split('@');
+                    let [hostPort, params] = hostPortAndParams.split('?');
+                    let [ip, port] = hostPort.split(':');
+
+                    ips.forEach(ipAddr => {
+                        let newTrojan = `${protocol}://${userInfo}@${ipAddr.trim()}:${port}?${params}`;
+                        newConfigs.push(newTrojan);
+                    });
+                } catch (e) {
+                    console.warn('Invalid trojan config. Skipping.');
+                }
+            }
+        });
+
+        resultBox.innerHTML = newConfigs.join('\n') || 'No valid configs found.';
+    }
+
+    function copyResults() {
+        let resultsText = document.getElementById('results').innerText;
+        navigator.clipboard.writeText(resultsText)
+            .then(() => alert('Results copied to clipboard!'))
+            .catch(err => console.error('Failed to copy text: ', err));
+    }
+</script>
+
+</body>
+</html>
