@@ -132,7 +132,7 @@
     <!-- Footer Section -->
     <br>
     <div class="footer">
-        <div id="visitor-count">Loading visitor count...</div>
+        <div id="visitor-count">...</div>
         <div class="footer-icons">
             <a href="https://t.me/Surfboardv2ray" target="_blank">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram Icon">
@@ -150,7 +150,7 @@
         fetch(viewercount)
             .then(response => response.text())
             .then(data => {
-                document.getElementById('visitor-count').innerHTML = `Visitor Count: ${data}`;
+                document.getElementById('visitor-count').innerHTML = `${data}`;
             })
             .catch(error => console.error('Error fetching visitor count:', error));
     </script>
