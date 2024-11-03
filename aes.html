@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AES Encryption/Decryption Tool</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0d1b2a, #1b263b, #415a77);
+            color: #f0f0f0;
+            text-align: center;
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            background: #1b263b;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            max-width: 500px;
+            margin: auto;
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+            background: #415a77;
+            color: #f0f0f0;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            background-color: #0d1b2a;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #1f3c5a;
+        }
+
+        .result-box {
+            margin-top: 20px;
+            background: #0d1b2a;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .result-box p {
+            word-break: break-all;
+        }
+
+        /* Styles for the footer links */
+        .footer {
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: #f0f0f0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .footer-links img {
+            width: 24px;
+            height: 24px;
+            margin-right: 5px;
+        }
+
+        .footer-text {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>AES Encryption/Decryption Tool</h1>
+    <div class="container">
+        <label for="key">Encryption Key:</label>
+        <input type="text" id="key" placeholder="Enter or Generate AES Key">
+
+        <label for="text-input">Text to Encrypt:</label>
+        <textarea id="text-input" rows="4" placeholder="Enter text to encrypt"></textarea>
+        <button onclick="encryptText()">Encrypt</button>
+
+        <div class="result-box">
+            <h3>Encrypted Text:</h3>
+            <p id="encrypted-text"></p>
+        </div>
+<br>
+        <label for="encrypted-input">Encrypted Text to Decrypt:</label>
+        <textarea id="encrypted-input" rows="4" placeholder="Enter encrypted text"></textarea>
+        <button onclick="decryptText()">Decrypt</button>
+
+        <div class="result-box">
+            <h3>Decrypted Text:</h3>
+            <p id="decrypted-text"></p>
+        </div>
+    </div>
+
+<br>
+
+    <div class="footer">
+        <div class="footer-links">
+            <a href="https://t.me/Surfboardv2ray" target="_blank">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram Icon">
+                Telegram
+            </a>
+            <a href="https://github.com/Surfboardv2ray" target="_blank">
+                <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Icon">
+                GitHub
+            </a>
+        </div>
+        <div class="footer-text">Surfboardv2ray, 2024</div>
+    </div>
+
+    <script>
+        function encryptText() {
+            const text = document.getElementById("text-input").value;
+            const key = document.getElementById("key").value;
+            if (!key || !text) {
+                alert("Please enter a key and text to encrypt.");
+                return;
+            }
+            const keyWordArray = CryptoJS.enc.Hex.parse(CryptoJS.SHA256(key).toString().substr(0, 32));
+            const encrypted = CryptoJS.AES.encrypt(text, keyWordArray, {
+                mode: CryptoJS.mode.ECB,
+                padding: CryptoJS.pad.Pkcs7
+            });
+            document.getElementById("encrypted-text").textContent = encrypted.toString();
+        }
+
+        function decryptText() {
+            const encryptedText = document.getElementById("encrypted-input").value;
+            const key = document.getElementById("key").value;
+            if (!key || !encryptedText) {
+                alert("Please enter a key and encrypted text to decrypt.");
+                return;
+            }
+            const keyWordArray = CryptoJS.enc.Hex.parse(CryptoJS.SHA256(key).toString().substr(0, 32));
+            const decrypted = CryptoJS.AES.decrypt(encryptedText, keyWordArray, {
+                mode: CryptoJS.mode.ECB,
+                padding: CryptoJS.pad.Pkcs7
+            });
+            const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
+            document.getElementById("decrypted-text").textContent = decryptedText || "Decryption failed. Check your key or input.";
+        }
+    </script>
+</body>
+</html>
